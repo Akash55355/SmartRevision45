@@ -1,23 +1,190 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuizMaster</title>
+  <!--
+    Smart Quiz App
+    - Mobile-first, accessible, and GitHub Pages ready.
+    - Links to: style.css, questions.js, script.js
+    - Author: (You can set your name in the app at runtime)
+  -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Smart Quiz App - A lightweight quiz application built with HTML, CSS and vanilla JavaScript." />
+  <title>Smart Quiz App</title>
 
-  <link rel="stylesheet" href="style.css">
+  <!-- Link to stylesheet (provided next after your 'next' command) -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Favicon (simple emoji as favicon via data URL, replace if you like) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='20'%3E🧠%3C/text%3E%3C/svg%3E" />
 </head>
 <body>
+  <!-- App container -->
+  <div class="app" id="app">
 
-  <div class="container">
-    <h1>QuizMaster</h1>
-    <p>Welcome to QuizMaster!</p>
+    <!-- Header: App title / logo and theme toggle -->
+    <header class="header">
+      <div class="brand">
+        <!-- Simple logo text + emoji for a modern feel -->
+        <div class="logo" aria-hidden="true">🧠</div>
+        <h1 class="app-title">Smart Quiz App</h1>
+      </div>
 
-    <button id="startBtn">Start Quiz</button>
+      <!-- Right-side controls: theme toggle and highest score display -->
+      <div class="controls">
+        <!-- Theme toggle -->
+        <button id="theme-toggle" class="btn theme-toggle" aria-pressed="false" title="Toggle dark / light mode">
+          <span class="theme-icon" aria-hidden="true">🌙</span>
+          <span class="sr-only">Toggle theme</span>
+        </button>
+
+        <!-- Highest score - filled by JavaScript from localStorage -->
+        <div class="highscore" id="highscore" aria-live="polite">
+          High Score: — 
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN: contains Home, Quiz, and Result sections. We hide/show them using JS -->
+    <main class="main">
+
+      <!-- HOME SECTION -->
+      <section id="home" class="page page--home active" aria-labelledby="home-title">
+        <div class="card hero-card">
+          <!-- App title and brief description -->
+          <h2 id="home-title" class="hero-title">Welcome to Smart Quiz</h2>
+          <p class="hero-desc">Test your knowledge across History, Science, Mathematics and General Knowledge. Enter your name, choose a subject and start the quiz!</p>
+
+          <!-- Player name input -->
+          <label for="player-name" class="label">Player name</label>
+          <input type="text" id="player-name" class="input" placeholder="Enter your name" maxlength="30" />
+
+          <!-- Subject selection - use selectable cards for better mobile UX -->
+          <div class="subjects" id="subjects" role="list" aria-label="Select a subject">
+            <p class="label">Choose a subject</p>
+            <div class="subject-list">
+              <!-- Each subject button has data-subject attribute which script reads -->
+              <button class="subject-btn" data-subject="history" role="listitem">History</button>
+              <button class="subject-btn" data-subject="science" role="listitem">Science</button>
+              <button class="subject-btn" data-subject="mathematics" role="listitem">Mathematics</button>
+              <button class="subject-btn" data-subject="general" role="listitem">General Knowledge</button>
+            </div>
+          </div>
+
+          <!-- Start quiz button - initially disabled until name + subject selected -->
+          <div class="home-actions">
+            <button id="start-quiz" class="btn primary" disabled>Start Quiz</button>
+          </div>
+
+          <!-- Small note about responsiveness -->
+          <p class="small muted">Tip: This app works well on phones — buttons are large for easy tapping.</p>
+        </div>
+      </section>
+
+      <!-- QUIZ SECTION -->
+      <section id="quiz" class="page page--quiz" aria-labelledby="quiz-title" hidden>
+        <div class="card quiz-card">
+          <!-- Top area: player info, subject, question number and timer -->
+          <div class="quiz-top">
+            <div class="player-info">
+              <span id="player-display" class="player-name">Player: —</span>
+              <span id="subject-display" class="subject-name">Subject: —</span>
+            </div>
+
+            <div class="question-meta">
+              <span id="question-number" class="q-number">Question 1 / 10</span>
+              <!-- Timer -->
+              <div class="timer" title="Time left for this question">
+                <svg class="timer-circle" viewBox="0 0 36 36" aria-hidden="true">
+                  <path class="circle-bg" d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  <path id="timer-progress" class="circle-progress" d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                </svg>
+                <div class="time-text" id="time-text" aria-live="polite">00</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="progress-wrap" aria-hidden="false" aria-label="Quiz progress">
+            <div class="progress" id="progress">
+              <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+            </div>
+            <div class="progress-percent" id="progress-percent">0%</div>
+          </div>
+
+          <!-- Question area -->
+          <div class="question-area">
+            <!-- Question text -->
+            <h3 id="question-text" class="question-text">Question will appear here</h3>
+
+            <!-- Options list -->
+            <ul id="options" class="options" role="list" aria-label="Answer choices">
+              <!-- Options populated by JavaScript (4 per question) -->
+            </ul>
+          </div>
+
+          <!-- Actions: Next question -->
+          <div class="quiz-actions">
+            <button id="next-btn" class="btn" disabled>Next Question</button>
+            <button id="quit-btn" class="btn muted">Quit</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULT SECTION -->
+      <section id="result" class="page page--result" aria-labelledby="result-title" hidden>
+        <div class="card result-card">
+          <h2 id="result-title" class="result-title">Quiz Results</h2>
+          <!-- Result summary -->
+          <div class="result-summary">
+            <p><strong>Player:</strong> <span id="result-player">—</span></p>
+            <p><strong>Subject:</strong> <span id="result-subject">—</span></p>
+            <p><strong>Total Questions:</strong> <span id="result-total">0</span></p>
+            <p><strong>Correct Answers:</strong> <span id="result-correct">0</span></p>
+            <p><strong>Wrong Answers:</strong> <span id="result-wrong">0</span></p>
+            <p><strong>Final Score:</strong> <span id="result-score">0</span></p>
+            <p><strong>Performance:</strong> <span id="result-message">—</span></p>
+          </div>
+
+          <!-- Result actions -->
+          <div class="result-actions">
+            <button id="restart-btn" class="btn primary">Restart Quiz</button>
+            <button id="home-btn" class="btn">Go Home</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer (small credit) -->
+    <footer class="footer">
+      <p>Made with ♥ using HTML, CSS and Vanilla JS — GitHub Pages ready.</p>
+    </footer>
   </div>
 
-  <script src="questions.js"></script>
-  <script src="script.js"></script>
+  <!-- Screen-reader only helper styles (kept in HTML for accessibility fallback) -->
+  <style>
+    .sr-only { 
+      position: absolute; 
+      width: 1px; 
+      height: 1px; 
+      padding: 0; 
+      margin: -1px; 
+      overflow: hidden; 
+      clip: rect(0, 0, 0, 0); 
+      white-space: nowrap; 
+      border: 0;
+    }
+  </style>
 
+  <!-- Questions data (loaded before main script) -->
+  <script src="questions.js" defer></script>
+
+  <!-- Main script handles interaction, timer, progress, storage, UI updates -->
+  <script src="script.js" defer></script>
 </body>
 </html>
