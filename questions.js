@@ -1,277 +1,225 @@
 /* ==========================================================================
-   questions.js
-   - All quiz questions stored here, separated by subject.
-   - Each subject is an array of question objects.
-   - Each question object format:
-     {
-       question: "Question text",
-       options: ["Option A", "Option B", "Option C", "Option D"],
-       answer: 1,        // index (0-based) of the correct option in `options`
-       time: 20          // optional: seconds allowed for this question (used by script.js)
-     }
-   - NOTE: Subject keys must match the `data-subject` attributes used in index.html:
-     'history', 'science', 'mathematics', 'general'
-   - You can extend, remove, or edit questions here; keep the same object shape.
+   questions.js (Bengali biology set)
+   - Replaced science questions with the Bengali questions you provided.
+   - Each question has 4 options (one correct).
+   - time: 20 seconds per question (you can adjust).
+   - Keep filename as questions.js and ensure index.html loads this file.
    ========================================================================== */
 
 const QUESTIONS = {
-  history: [
-    {
-      question: "Who was the first President of the United States?",
-      options: ["Thomas Jefferson", "George Washington", "Abraham Lincoln", "John Adams"],
-      answer: 1,
-      time: 20
-    },
-    {
-      question: "Which ancient civilization built the pyramids at Giza?",
-      options: ["Romans", "Greeks", "Egyptians", "Babylonians"],
-      answer: 2,
-      time: 20
-    },
-    {
-      question: "In which year did World War II end?",
-      options: ["1945", "1939", "1918", "1950"],
-      answer: 0,
-      time: 20
-    },
-    {
-      question: "Who was known as the 'Maid of Orléans' and led French troops during the Hundred Years' War?",
-      options: ["Catherine the Great", "Joan of Arc", "Isabella I", "Eleanor of Aquitaine"],
-      answer: 1,
-      time: 20
-    },
-    {
-      question: "Which empire was ruled by Genghis Khan?",
-      options: ["Ottoman Empire", "Mongol Empire", "Roman Empire", "Persian Empire"],
-      answer: 1,
-      time: 20
-    },
-    {
-      question: "The Renaissance began in which country in the 14th–15th century?",
-      options: ["France", "England", "Italy", "Spain"],
-      answer: 2,
-      time: 20
-    },
-    {
-      question: "Which event is commonly used to mark the beginning of the modern era in 1789?",
-      options: ["American Revolution", "French Revolution", "Industrial Revolution", "Russian Revolution"],
-      answer: 1,
-      time: 20
-    },
-    {
-      question: "Who was the British Prime Minister during most of World War II?",
-      options: ["Neville Chamberlain", "Winston Churchill", "Clement Attlee", "Harold Macmillan"],
-      answer: 1,
-      time: 20
-    },
-    {
-      question: "Which wall separated East and West Berlin from 1961 to 1989?",
-      options: ["Great Wall", "Berlin Wall", "Hadrian's Wall", "Wailing Wall"],
-      answer: 1,
-      time: 20
-    },
-    {
-      question: "Which famous ship sank on its maiden voyage in 1912 after hitting an iceberg?",
-      options: ["Lusitania", "Britannic", "Titanic", "Mayflower"],
-      answer: 2,
-      time: 20
-    }
-  ],
-
   science: [
     {
-      question: "What is the chemical symbol for water?",
-      options: ["H2O", "CO2", "O2", "NaCl"],
+      question: "প্রাকৃতিক নির্বাচনবাদ-এর প্রবর্তক কে?",
+      options: ["চার্লস ডারউইন", "জাঁ-ব্যাপ্টিস্ট ল্যামার্ক", "আর্নস্ট হেকেল", "গ্রেগর মেন্ডেল"],
       answer: 0,
       time: 20
     },
     {
-      question: "What force keeps planets in orbit around the Sun?",
-      options: ["Magnetism", "Friction", "Gravity", "Radiation"],
-      answer: 2,
-      time: 20
-    },
-    {
-      question: "Which organelle is known as the 'powerhouse of the cell'?",
-      options: ["Nucleus", "Mitochondria", "Ribosome", "Golgi apparatus"],
-      answer: 1,
-      time: 20
-    },
-    {
-      question: "What is the speed of light in vacuum approximately?",
-      options: ["300,000 km/s", "150,000 km/s", "30,000 km/s", "3,000 km/s"],
+      question: "সমসংস্ত অঙ্গ কোন ধরনের বিবর্তনকে নির্দেশ করে?",
+      options: ["অপসারী", "সমমুখী", "প্রতিকূল", "রূপান্তরী"],
       answer: 0,
       time: 20
     },
     {
-      question: "Which gas do plants primarily absorb from the atmosphere for photosynthesis?",
-      options: ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"],
-      answer: 2,
-      time: 20
-    },
-    {
-      question: "What is the center of an atom called?",
-      options: ["Electron", "Proton", "Nucleus", "Neutron"],
-      answer: 2,
-      time: 20
-    },
-    {
-      question: "Which of the following is a non-renewable energy source?",
-      options: ["Solar", "Wind", "Coal", "Hydroelectric"],
-      answer: 2,
-      time: 20
-    },
-    {
-      question: "What phenomenon explains why we see a rainbow?",
-      options: ["Reflection only", "Refraction and dispersion", "Diffraction", "Interference"],
-      answer: 1,
-      time: 20
-    },
-    {
-      question: "What is the pH value of pure water at 25°C (neutral)?",
-      options: ["0", "7", "14", "1"],
-      answer: 1,
-      time: 20
-    },
-    {
-      question: "Which particle has a negative electric charge?",
-      options: ["Proton", "Neutron", "Electron", "Photon"],
-      answer: 2,
-      time: 20
-    }
-  ],
-
-  mathematics: [
-    {
-      question: "What is 12 × 8?",
-      options: ["96", "88", "108", "86"],
+      question: "মানুষের দুটি নিষ্ক্রিয় (vestigial) অঙ্গের নাম কি?",
+      options: ["ককট্যিক্স ও অ্যাপেন্ডিক্স", "কালা ও পাত্রী", "হৃদয় ও ফুসফুস", "কাঁধ ও কপাল"],
       answer: 0,
       time: 20
     },
     {
-      question: "Solve for x: 2x + 5 = 13.",
-      options: ["4", "6", "3", "5"],
+      question: "একটি মেরুদন্ডী প্রাণীর নাম লেখ যার নিলয় বিভর আংশিক প্রাচীন যুক্ত — উত্তর হিসেবে কোন প্রাণীর নাম দেওয়া হয়েছিল?",
+      options: ["টিকটিকি", "বাঘ", "কুমির", "মাছ"],
       answer: 0,
       time: 20
     },
     {
-      question: "What is the value of π (pi) approximately?",
-      options: ["2.14", "3.14", "4.13", "3.41"],
-      answer: 1,
-      time: 20
-    },
-    {
-      question: "A right triangle has legs 3 and 4. What is the hypotenuse?",
-      options: ["5", "6", "7", "4"],
+      question: "অঙ্গের ব্যবহার ও অপব্যবহার সূত্রের (use and disuse theory) প্রবর্তক কে?",
+      options: ["ল্যামার্ক", "ডারউইন", "মেন্ডেল", "হেকেল"],
       answer: 0,
       time: 20
     },
     {
-      question: "What is 15% of 200?",
-      options: ["20", "25", "30", "35"],
-      answer: 2,
-      time: 20
-    },
-    {
-      question: "What is the next number in the sequence: 2, 4, 8, 16, ?",
-      options: ["20", "24", "32", "34"],
-      answer: 2,
-      time: 20
-    },
-    {
-      question: "What is the area of a rectangle with width 5 and height 9?",
-      options: ["14", "45", "36", "40"],
-      answer: 1,
-      time: 20
-    },
-    {
-      question: "Which property states that a + b = b + a?",
-      options: ["Distributive", "Commutative", "Associative", "Identity"],
-      answer: 1,
-      time: 20
-    },
-    {
-      question: "What is 7 squared?",
-      options: ["14", "49", "21", "57"],
-      answer: 1,
-      time: 20
-    },
-    {
-      question: "If x = 3 and y = 4, what is x^2 + y^2?",
-      options: ["12", "25", "9", "7"],
-      answer: 1,
-      time: 20
-    }
-  ],
-
-  general: [
-    {
-      question: "What is the capital city of France?",
-      options: ["Berlin", "Madrid", "Paris", "Rome"],
-      answer: 2,
-      time: 20
-    },
-    {
-      question: "Which planet is known as the Red Planet?",
-      options: ["Venus", "Mars", "Jupiter", "Saturn"],
-      answer: 1,
-      time: 20
-    },
-    {
-      question: "Which language is primarily spoken in Brazil?",
-      options: ["Spanish", "Portuguese", "English", "French"],
-      answer: 1,
-      time: 20
-    },
-    {
-      question: "What does HTTP stand for in web addresses?",
-      options: [
-        "HyperText Transfer Protocol",
-        "High Transfer Text Protocol",
-        "Hyperlink Transfer Program",
-        "HyperText Transmission Process"
-      ],
+      question: "উদ্ভিদ জগতের দুটি জীবিত জীবাশ্ম (living fossil) উদাহরণ কী দেওয়া হলো?",
+      options: ["সিংকগো বাইলোবা ও সাইকপ", "রোজুবৃক্ষ ও আলমোন্ড", "পাইন ও ওক", "ম্যাঙ্গো ও বাম"],
       answer: 0,
       time: 20
     },
     {
-      question: "Which animal is known as the 'King of the Jungle'?",
-      options: ["Tiger", "Elephant", "Lion", "Gorilla"],
-      answer: 2,
-      time: 20
-    },
-    {
-      question: "Which country hosts the Great Barrier Reef?",
-      options: ["Australia", "USA", "South Africa", "India"],
+      question: "ল্যামার্কের লেখা বইটির নাম কি?",
+      options: ["ফিলোসফি জুলজিক", "অন দ্যা অরিজিন অফ স্পিসিজ", "জাতীয় জীববিজ্ঞান", "বিবর্তন তত্ত্ব"],
       answer: 0,
       time: 20
     },
     {
-      question: "What color do you get when you mix red and white?",
-      options: ["Pink", "Purple", "Orange", "Brown"],
+      question: "প্রাকৃতিক নির্বাচনবাদ কোন বইতে লিখিত আছে?",
+      options: ["অন দ্যা অরিজিন অফ স্পিসিজ", "দ্য ডিজাইন অফ ল্যামার্ক", "জেনেটিক্স বেসিক্স", "এভোলিউশনাল সাইকোলজি"],
       answer: 0,
       time: 20
     },
     {
-      question: "How many continents are there on Earth?",
-      options: ["5", "6", "7", "8"],
-      answer: 2,
+      question: "বায়োজেনেটিক সূত্রের (biogenetic law) প্রবর্তক কে?",
+      options: ["আর্নস্ট হেকেল", "ডারউইন", "ল্যামার্ক", "ওয়ালেস"],
+      answer: 0,
       time: 20
     },
     {
-      question: "Which company created the iPhone?",
-      options: ["Google", "Microsoft", "Apple", "Samsung"],
-      answer: 2,
+      question: "ভেনাস বা একচক্রী (one-eyed) হৃৎপিণ্ড কোথায় দেখা যায়?",
+      options: ["মাছের", "পোল্ট্রি", "কাঁকড়ার", "শঙ্খের"],
+      answer: 0,
       time: 20
     },
     {
-      question: "What is the common name for dried plums?",
-      options: ["Raisins", "Prunes", "Dates", "Figs"],
-      answer: 1,
+      question: "ডারউইন কোন বিষয়টিকে 'প্রকৃতির খেলা' হিসেবে উল্লেখ করেছিলেন?",
+      options: ["মিউটেশন বা পরিব্যাক্তি", "রসায়ন", "মেকানিক্স", "জেনেটিক্স"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "অস্তিযুক্ত মাছের পটকার গ্যাস শোষণ করে কোন অংশ?",
+      options: ["রেটিমিরাবিলি", "গিল", "ফুসফুস", "যকৃত"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "ক্যাকটাসের স্থূল রসালো চ্যাপ্টা পাতার মতো সবুজ কান্ডকে কি বলা হয়?",
+      options: ["ফাইলোক্লেড বা পর্নকাণ্ড", "পত্র", "শাখা", "শিকড়"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "উটের মূত্রের মাধ্যমে রচিত হয় কোন অ্যাসিড?",
+      options: ["ইউরিক অ্যাসিড", "অ্যাসিটিক অ্যাসিড", "ল্যাকটিক অ্যাসিড", "ব্যাটেরিয়াল অ্যাসিড"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "মৌমাছির নৃত্যের ভাষা কে আবিষ্কার করেছেন?",
+      options: ["কার্ল ফন ফ্রিশ", "ডারউইন", "ল্যামার্ক", "ওয়ালেস"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "মৌমাছির আট অঙ্গের মতো নৃত্যকে কী বলা হয়?",
+      options: ["ওয়াগল নৃত্য", "বালেন্স নৃত্য", "স্টেপিং নৃত্য", "রিং নৃত্য"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "শিল্পাঞ্জিলা কিভাবে শক্ত খোলা ভেঙ্গে বাদাম খায়?",
+      options: ["পাথর বা কাঠের টুকরোকে হাতুড়ি ও নেহাই হিসেবে ব্যবহার করে", "দাঁত দিয়ে কুচি করে", "পা দিয়ে চিপকে ফেলে", "উড়ে গিয়ে গাছ নেড়ে ফেলে"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "জরায়ুজ (অঙ্কুরোদগমন) কোথায় দেখা যায়?",
+      options: ["সুন্দরী গাছের", "চামচির গাছের", "পাইন গাছের", "তেল গাছের"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "পটকার অগ্রপ্রকষ্টে কোন অঙ্গ থাকে?",
+      options: ["রেডগ্রন্থি", "গিল", "হাড়", "চামড়া"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "পায়রার কোন অঙ্গের রূপান্তর?",
+      options: ["অগ্রপথ", "পাখা", "পা", "চোয়াল"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "উটের কুজের ভিতরে কি থাকে?",
+      options: ["ফ্যাট বা চর্বি", "পানি", "অ্যান্টিবডি", "প্রোটিন"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "কিসের কারণে ক্যাকটাসের পাতা কাটার রূপান্তর হয়েছে?",
+      options: ["রোদ ও জলের অভাব (মরূ অঞ্চল বেঁচে থাকার জন্য)", "অতিরিক্ত পুষ্টি", "ঠান্ডা জল", "পানির সোর্স বৃদ্ধি"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "বায়ুর সাহায্যে পরাগযোগ ঘটে এমন দুটি উদ্ভিদ উদাহরণ কী?",
+      options: ["ধান ও গম", "কলা ও কদম", "শিমুল ও পলাশ", "জবা ও সরিষা"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "জলের সাহায্যে পরাগ যোগ ঘটে এমন উদ্ভিদ নমুনা কী?",
+      options: ["পাতাশ্যাওলা ও পাতাঝাঁঝি", "ধান ও গম", "শিমুল ও পলাশ", "কলম ও বেল"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "বাদুড়ের সাহায্যে পরাগযোগ ঘটে এমন উদ্ভিদের উদাহরণ কী?",
+      options: ["কলা ও কদম", "ধান ও গম", "শিমুল ও পলাশ", "জবা ও সরিষা"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "পাখির সাহায্যে পরাগযোগ ঘটে এমন উদ্ভিদ নিদর্শন কী?",
+      options: ["শিমুল ও পলাশ", "ধান ও গম", "পাতাশ্যাওলা ও পাতাঝাঁঝি", "কলম ও বেল"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "শামুকের সাহায্যে পরাগযোগ ঘটে এমন উদ্ভিদের উদাহরণ কী?",
+      options: ["মানকচু ও ওল", "কলি ও কাঁঠাল", "ধান ও গম", "শিমুল ও পলাশ"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "স্বপরাগযোগ (self-pollination) ঘটে এমন দুটি উদ্ভিদ কী?",
+      options: ["জবা ও সরিষা", "কলা ও কদম", "শিমুল ও পলাশ", "মানকচু ও ওল"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "খন্ডিভবন (fragmentation) প্রক্রিয়া কোথায় দেখা যায়?",
+      options: ["স্পাইরোগাইরা, প্ল্যানেরিয়া, হাইড্রা", "মশা, পিপড়া, তেলাপোকা", "পাইন, ওক, সেকোয়া", "মানুষ, শর্ত, বিড়াল"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "হাইড্রা কোন প্রক্রিয়ায় জন্মায়?",
+      options: ["কোরকোদগম (budding)", "বিজোয়ন", "রেনু", "সক্রিয়করণ"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "রেনু (spore) দ্বারা কাদের জন্ম হয়?",
+      options: ["ছত্রাক, শ্যাওলা ও ফার্ন", "মাছ, কাঁকড়া ও প্রাণ", "পোকা, মাকড়সা ও শামুক", "কামড়, নেকড়ে ও হাতি"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "বহু বিভাজন (multiple fission) কোথায় দেখা যায়?",
+      options: ["প্লাসমোডিয়াম", "মানুষে", "গাছপালায়", "পোল্ট্রিতে"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "দুটি এক লিঙ্গ ফুলের উদাহরণ কোনটি?",
+      options: ["কুমড়ো ও লাউ", "ঝাড়বুনো ও রোজ", "শিমুল ও পলাশ", "ধান ও গম"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "পুনরুৎপাদন (regeneration) কোথায় দেখা যায়?",
+      options: ["প্ল্যানেরিয়া", "মানুষে", "গরুতে", "পাকে"],
+      answer: 0,
+      time: 20
+    },
+    {
+      question: "যৌন জননের একক (unit of sexual reproduction) কি?",
+      options: ["গ্যামেট", "রেনু", "সেল", "অ্যামিবা"],
+      answer: 0,
       time: 20
     }
   ]
 };
 
-/* Make QUESTIONS available globally (for older browsers or other scripts) */
+/* Make QUESTIONS available globally */
 window.QUESTIONS = QUESTIONS;
