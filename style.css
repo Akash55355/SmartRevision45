@@ -1,41 +1,29 @@
 /* ==========================================================================
-   Smart Quiz App - style.css
+   Smart Revision App - style.css
    - Mobile-first responsive styles
    - Light and Dark theme support (uses `data-theme="dark"` on <body>)
    - Clean, modern card design with animations
-   - Beginner-friendly comments throughout
    ========================================================================== */
 
-/* -------------------------
-   CSS Variables (themeable)
-   ------------------------- */
 :root {
-  /* Colors */
   --bg: #f6f8fb;
   --card: #ffffff;
   --muted: #6b7280;
   --text: #0f172a;
-  --primary: #4f46e5;      /* indigo */
+  --primary: #4f46e5;
   --primary-600: #4338ca;
-  --accent: #06b6d4;       /* teal */
+  --accent: #06b6d4;
   --success: #16a34a;
   --danger: #ef4444;
   --glass: rgba(15,23,42,0.05);
-
-  /* Sizing */
   --radius: 14px;
   --card-padding: 18px;
   --max-width: 900px;
-
-  /* Animation */
   --ease: cubic-bezier(.2,.9,.3,1);
   --shadow: 0 6px 20px rgba(2,6,23,0.08);
-
-  /* Timer - circle stroke */
   --timer-stroke: 6;
 }
 
-/* Dark theme variables (applied when body[data-theme="dark"]) */
 body[data-theme="dark"] {
   --bg: #071022;
   --card: #0b1220;
@@ -48,14 +36,11 @@ body[data-theme="dark"] {
   --shadow: 0 8px 30px rgba(2,6,23,0.6);
 }
 
-/* -------------------------
-   Global Resets and Body
-   ------------------------- */
 * { box-sizing: border-box; }
 html,body { height: 100%; }
 body {
   margin: 0;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   background: linear-gradient(180deg, var(--bg), color-mix(in srgb, var(--bg) 95%, transparent));
   color: var(--text);
   -webkit-font-smoothing: antialiased;
@@ -66,7 +51,6 @@ body {
   justify-content: center;
 }
 
-/* App container centers content with a max width */
 .app {
   width: 100%;
   max-width: var(--max-width);
@@ -76,9 +60,6 @@ body {
   gap: 14px;
 }
 
-/* -------------------------
-   Header
-   ------------------------- */
 .header {
   display: flex;
   align-items: center;
@@ -86,7 +67,6 @@ body {
   gap: 12px;
 }
 
-/* Brand area */
 .brand {
   display: flex;
   align-items: center;
@@ -108,7 +88,6 @@ body {
   letter-spacing: -0.2px;
 }
 
-/* Controls on the right (theme toggle + highscore) */
 .controls {
   display: flex;
   align-items: center;
@@ -125,7 +104,6 @@ body {
 .theme-toggle:hover { transform: translateY(-2px); }
 .theme-icon { font-size: 16px; }
 
-/* Highscore text */
 .highscore {
   font-size: 14px;
   color: var(--muted);
@@ -134,9 +112,6 @@ body {
   background: var(--glass);
 }
 
-/* -------------------------
-   Card styles (used for home, quiz, result)
-   ------------------------- */
 .card {
   background: linear-gradient(180deg, var(--card), color-mix(in srgb, var(--card) 95%, transparent));
   border-radius: var(--radius);
@@ -145,37 +120,20 @@ body {
   transition: transform 300ms var(--ease), box-shadow 300ms var(--ease);
   width: 100%;
 }
-
-/* Slight lift on hover (desktop) */
 .card:hover { transform: translateY(-4px); }
 
-/* Page sections */
 .page { display: none; }
 .page.active { display: block; }
 
-/* -------------------------
-   Home / Hero card
-   ------------------------- */
 .hero-card {
   display: grid;
   gap: 12px;
   text-align: left;
 }
-.hero-title {
-  margin: 0;
-  font-size: 20px;
-}
-.hero-desc {
-  margin: 0;
-  color: var(--muted);
-}
+.hero-title { margin: 0; font-size: 20px; }
+.hero-desc { margin: 0; color: var(--muted); }
 
-/* Input and labels */
-.label {
-  margin: 8px 0 4px 0;
-  font-size: 13px;
-  color: var(--muted);
-}
+.label { margin: 8px 0 4px 0; font-size: 13px; color: var(--muted); }
 .input {
   width: 100%;
   padding: 12px 14px;
@@ -191,7 +149,6 @@ body {
   border-color: color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
-/* Subjects grid */
 .subjects { margin-top: 6px; }
 .subject-list {
   display: grid;
@@ -217,12 +174,7 @@ body {
   transform: translateY(-6px);
 }
 
-/* Home actions */
-.home-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 8px;
-}
+.home-actions { display: flex; gap: 10px; margin-top: 8px; }
 .btn {
   padding: 10px 14px;
   border-radius: 12px;
@@ -238,63 +190,24 @@ body {
   color: #fff;
   box-shadow: 0 10px 30px color-mix(in srgb, var(--primary) 14%, transparent);
 }
-.btn.muted {
-  background: transparent;
-  color: var(--muted);
-}
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
+.btn.muted { background: transparent; color: var(--muted); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-/* -------------------------
-   Quiz Card Layout
-   ------------------------- */
-.quiz-card {
-  display: grid;
-  gap: 12px;
-}
+.quiz-card { display: grid; gap: 12px; }
 .quiz-top {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   align-items: center;
 }
-.player-info {
-  display: flex;
-  gap: 10px;
-  align-items: baseline;
-  font-size: 14px;
-  color: var(--muted);
-}
-.player-name, .subject-name {
-  background: var(--glass);
-  padding: 6px 10px;
-  border-radius: 10px;
-  color: var(--text);
-}
+.player-info { display: flex; gap: 10px; align-items: baseline; font-size: 14px; color: var(--muted); }
+.player-name, .subject-name { background: var(--glass); padding: 6px 10px; border-radius: 10px; color: var(--text); }
 
-/* Question meta (number + timer) */
-.question-meta {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
+.question-meta { display: flex; gap: 12px; align-items: center; }
 .q-number { font-weight: 700; color: var(--muted); }
 
-/* Timer styling */
-.timer {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  position: relative;
-}
-.timer-circle {
-  width: 48px;
-  height: 48px;
-  transform: rotate(-90deg); /* start at top */
-}
+.timer { display: flex; align-items: center; gap: 8px; position: relative; }
+.timer-circle { width: 48px; height: 48px; transform: rotate(-90deg); }
 .timer-circle .circle-bg {
   fill: none;
   stroke: color-mix(in srgb, var(--text) 6%, transparent);
@@ -307,7 +220,6 @@ body {
   stroke-width: var(--timer-stroke);
   stroke-linecap: round;
   transition: stroke-dashoffset 0.6s linear;
-  /* stroke-dasharray & offset controlled via JS for progress */
 }
 .time-text {
   position: absolute;
@@ -320,19 +232,8 @@ body {
   transform: translateY(2px);
 }
 
-/* Progress bar */
-.progress-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.progress {
-  flex: 1;
-  height: 10px;
-  background: color-mix(in srgb, var(--text) 6%, transparent);
-  border-radius: 999px;
-  overflow: hidden;
-}
+.progress-wrap { display: flex; align-items: center; gap: 10px; }
+.progress { flex: 1; height: 10px; background: color-mix(in srgb, var(--text) 6%, transparent); border-radius: 999px; overflow: hidden; }
 .progress-bar {
   height: 100%;
   width: 0%;
@@ -340,33 +241,12 @@ body {
   border-radius: 999px;
   transition: width 450ms var(--ease);
 }
-.progress-percent {
-  min-width: 44px;
-  text-align: right;
-  font-weight: 700;
-  color: var(--muted);
-}
+.progress-percent { min-width: 44px; text-align: right; font-weight: 700; color: var(--muted); }
 
-/* Question area */
-.question-area {
-  display: grid;
-  gap: 10px;
-}
-.question-text {
-  margin: 0;
-  font-size: 17px;
-  font-weight: 700;
-}
-.options {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 10px;
-}
-.options li {
-  display: block;
-}
+.question-area { display: grid; gap: 10px; }
+.question-text { margin: 0; font-size: 17px; font-weight: 700; }
+.options { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.options li { display: block; }
 .option {
   display: block;
   width: 100%;
@@ -380,56 +260,52 @@ body {
   text-align: left;
 }
 .option:hover { transform: translateY(-3px); }
-.option.selected {
-  box-shadow: 0 10px 26px color-mix(in srgb, var(--primary) 10%, transparent);
-  border-color: color-mix(in srgb, var(--primary) 30%, transparent);
-}
+.option.selected { box-shadow: 0 10px 26px color-mix(in srgb, var(--primary) 10%, transparent); border-color: color-mix(in srgb, var(--primary) 30%, transparent); }
 .option.correct {
   background: color-mix(in srgb, var(--success) 8%, transparent);
   border-color: color-mix(in srgb, var(--success) 30%, transparent);
-  color: color-mix(in srgb, var(--success) 30%, transparent);
   box-shadow: 0 8px 18px color-mix(in srgb, var(--success) 8%, transparent);
 }
 .option.wrong {
   background: color-mix(in srgb, var(--danger) 8%, transparent);
   border-color: color-mix(in srgb, var(--danger) 30%, transparent);
-  color: color-mix(in srgb, var(--danger) 20%, transparent);
 }
 
-/* Small muted helper text */
 .small { font-size: 13px; color: var(--muted); margin: 0; }
 .muted { color: var(--muted); }
 
-/* Quiz actions layout */
-.quiz-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
+.quiz-actions { display: flex; justify-content: space-between; gap: 10px; }
 
-/* -------------------------
-   Result Card
-   ------------------------- */
-.result-card {
-  display: grid;
-  gap: 12px;
-  text-align: left;
-}
+.result-card { display: grid; gap: 12px; text-align: left; }
 .result-title { margin: 0; font-size: 20px; }
 .result-summary p { margin: 6px 0; color: var(--muted); }
 .result-summary strong { color: var(--text); }
+.result-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
-/* Result action buttons */
-.result-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
+.footer { text-align: center; color: var(--muted); font-size: 13px; }
+
+[hidden] { display: none !important; }
+.visually-hidden { position: absolute !important; left: -9999px !important; top: auto; width: 1px; height: 1px; overflow: hidden; }
+
+@media (min-width: 520px) {
+  .subject-list { grid-template-columns: repeat(4, 1fr); }
+  .hero-card { grid-template-columns: 1fr 300px; align-items: center; }
+  .hero-desc { max-width: 52ch; }
 }
 
-/* -------------------------
-   Footer
-   ------------------------- */
-.footer {
+@media (min-width: 820px) {
+  body { padding: 32px; }
+  .app { gap: 20px; }
+  .card { padding: 22px; }
+  .timer-circle { width: 56px; height: 56px; }
+  .question-text { font-size: 19px; }
+}
+
+* {
+  transition-property: background-color, color, box-shadow, transform, border-color, opacity;
+  transition-duration: 260ms;
+  transition-timing-function: var(--ease);
+                                                }ooter {
   text-align: center;
   color: var(--muted);
   font-size: 13px;
