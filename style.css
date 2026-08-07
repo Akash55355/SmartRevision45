@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Smart Revision App - style.css
+   Smart Quiz App - style.css
    - Mobile-first responsive styles
    - Light and Dark theme support (uses `data-theme="dark"` on <body>)
    - Clean, modern card design with animations
@@ -301,42 +301,6 @@ body {
   .question-text { font-size: 19px; }
 }
 
-* {
-  transition-property: background-color, color, box-shadow, transform, border-color, opacity;
-  transition-duration: 260ms;
-  transition-timing-function: var(--ease);
-                                                }ooter {
-  text-align: center;
-  color: var(--muted);
-  font-size: 13px;
-}
-
-/* -------------------------
-   Accessibility & Utilities
-   ------------------------- */
-[hidden] { display: none !important; }
-.visually-hidden { position: absolute !important; left: -9999px !important; top: auto; width: 1px; height: 1px; overflow: hidden; }
-
-/* -------------------------
-   Responsive: Mobile-first then scale up
-   ------------------------- */
-@media (min-width: 520px) {
-  .subject-list { grid-template-columns: repeat(4, 1fr); }
-  .hero-card { grid-template-columns: 1fr 300px; align-items: center; }
-  .hero-desc { max-width: 52ch; }
-}
-
-@media (min-width: 820px) {
-  body { padding: 32px; }
-  .app { gap: 20px; }
-  .card { padding: 22px; }
-  .timer-circle { width: 56px; height: 56px; }
-  .question-text { font-size: 19px; }
-}
-
-/* -------------------------
-   Small touches: transitions for theme changes
-   ------------------------- */
 * {
   transition-property: background-color, color, box-shadow, transform, border-color, opacity;
   transition-duration: 260ms;
