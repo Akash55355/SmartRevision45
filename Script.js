@@ -1,18 +1,9 @@
 /* ==========================================================================
-   script.js
+   script.js (updated)
    - Main application logic for Smart Quiz App (vanilla JavaScript)
-   - Features:
-     - Navigation (Home -> Quiz -> Result)
-     - Player name handling and localStorage
-     - Subject selection
-     - Loading questions from questions.js
-     - Option selection and answer checking
-     - Per-question timer with SVG progress circle
-     - Progress bar and percentage
-     - Score calculation and highest-score persistence
-     - Result screen and restart/home actions
-     - Dark mode toggle with persistence
-     - Basic quiz progress persistence (resumable)
+   - Added: shuffleOptionsInQuestions() to randomize option order per question
+     on every NEW quiz start (but NOT when resuming).
+   - This ensures the correct answer won't always appear at the same position.
    ========================================================================== */
 
 (function () {
@@ -63,13 +54,13 @@
   let state = {
     player: '',
     subject: '',
-    questions: [], // references QUESTIONS[subject]
+    questions: [],
     total: 0,
     currentIndex: 0,
     score: 0,
     correctCount: 0,
     wrongCount: 0,
-    timePerQuestion: 20, // fallback seconds
+    timePerQuestion: 20,
   };
 
   // Timer internals
@@ -83,45 +74,59 @@
   const qsa = (sel, parent = document) => Array.from(parent.querySelectorAll(sel));
 
   // Save and load helpers
-  function savePlayerToStorage(name) {
-    localStorage.setItem(LS_PLAYER, name);
-  }
-  function loadPlayerFromStorage() {
-    return localStorage.getItem(LS_PLAYER) || '';
-  }
-  function saveHighscoreToStorage(value) {
-    localStorage.setItem(LS_HIGHSCORE, String(value));
-  }
-  function loadHighscoreFromStorage() {
-    const v = localStorage.getItem(LS_HIGHSCORE);
-    return v !== null ? Number(v) : 0;
-  }
-  function saveThemeToStorage(theme) {
-    localStorage.setItem(LS_THEME, theme);
-  }
-  function loadThemeFromStorage() {
-    return localStorage.getItem(LS_THEME) || null;
-  }
-  function saveProgressToStorage(progressObj) {
-    localStorage.setItem(LS_PROGRESS, JSON.stringify(progressObj));
-  }
-  function loadProgressFromStorage() {
-    try {
-      const raw = localStorage.getItem(LS_PROGRESS);
-      return raw ? JSON.parse(raw) : null;
-    } catch (e) {
-      return null;
+  function savePlayerToStorage(name) { localStorage.setItem(LS_PLAYER, name); }
+  function loadPlayerFromStorage() { return localStorage.getItem(LS_PLAYER) || ''; }
+  function saveHighscoreToStorage(value) { localStorage.setItem(LS_HIGHSCORE, String(value)); }
+  function loadHighscoreFromStorage() { const v = localStorage.getItem(LS_HIGHSCORE); return v !== null ? Number(v) : 0; }
+  function saveThemeToStorage(theme) { localStorage.setItem(LS_THEME, theme); }
+  function loadThemeFromStorage() { return localStorage.getItem(LS_THEME) || null; }
+  function saveProgressToStorage(progressObj) { localStorage.setItem(LS_PROGRESS, JSON.stringify(progressObj)); }
+  function loadProgressFromStorage() { try { const raw = localStorage.getItem(LS_PROGRESS); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
+  function clearProgressFromStorage() { localStorage.removeItem(LS_PROGRESS); }
+
+  // Shuffle array in-place (Fisher-Yates)
+  function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
     }
+    return arr;
   }
-  function clearProgressFromStorage() {
-    localStorage.removeItem(LS_PROGRESS);
+
+  // This function creates a deep-ish copy of questions array and shuffles options
+  // for each question, updating the answer index accordingly.
+  // We return a NEW array (do not modify original QUESTIONS object).
+  function shuffleOptionsInQuestions(questions) {
+    return questions.map(q => {
+      // Copy question object shallowly
+      const copy = {
+        question: q.question,
+        // copy options into array of {text, originalIndex}
+        options: q.options.map((opt, idx) => ({ text: opt, origIdx: idx })),
+        // We'll set answer later
+        answer: 0,
+        time: q.time
+      };
+
+      // Shuffle options array
+      shuffleArray(copy.options);
+
+      // Find where the original correct option moved to, set new answer index
+      const origCorrectIdx = q.answer; // original index (0-based)
+      const newIndex = copy.options.findIndex(o => o.origIdx === origCorrectIdx);
+
+      // Map options to plain strings and set correct answer index
+      copy.answer = newIndex >= 0 ? newIndex : 0;
+      copy.options = copy.options.map(o => o.text);
+
+      return copy;
+    });
   }
 
   // Simple helper to show a page and hide others
   function showPage(page) {
     [homePage, quizPage, resultPage].forEach(p => p.hidden = true);
     page.hidden = false;
-    // Keep 'active' class for CSS display toggles if needed
     [homePage, quizPage, resultPage].forEach(p => p.classList.remove('active'));
     page.classList.add('active');
   }
@@ -132,7 +137,7 @@
     highscoreEl.textContent = `High Score: ${high || '—'}`;
   }
 
-  // Apply theme from localStorage (or default to light)
+  // Apply theme
   function applyTheme(theme) {
     if (theme === 'dark') {
       document.body.setAttribute('data-theme', 'dark');
@@ -147,57 +152,33 @@
 
   // ---------- Initialization ----------
   function init() {
-    // Load saved player name
     const savedName = loadPlayerFromStorage();
-    if (savedName) {
-      inputName.value = savedName;
-    }
+    if (savedName) inputName.value = savedName;
 
-    // Load theme
     const savedTheme = loadThemeFromStorage();
     applyTheme(savedTheme || 'light');
 
-    // Render stored highscore
     renderHighscore();
-
-    // Set up event listeners
     attachEventListeners();
 
-    // Prepare timer path (SVG)
     if (timerPath && typeof timerPath.getTotalLength === 'function') {
-      // compute path length once
       timerPathLength = timerPath.getTotalLength();
       timerPath.style.strokeDasharray = timerPathLength;
       timerPath.style.strokeDashoffset = timerPathLength;
     }
 
-    // Enable/disable start button based on current inputs
     updateStartButtonState();
-
-    // Check if there's a saved progress and inform developer (we'll ask on start)
-    const progress = loadProgressFromStorage();
-    if (progress) {
-      // we won't auto-restore here; we'll prompt on start if player chooses same subject
-      // This log is helpful during development
-      // console.log('Found saved progress, will offer resume on start if applicable.', progress);
-    }
   }
 
   // ---------- Event listeners ----------
   function attachEventListeners() {
-    // Player name input: save to localStorage on input
     inputName.addEventListener('input', () => {
       const name = inputName.value.trim();
-      if (name.length > 0) {
-        savePlayerToStorage(name);
-      } else {
-        // optional: remove stored name when field is cleared
-        localStorage.removeItem(LS_PLAYER);
-      }
+      if (name.length > 0) savePlayerToStorage(name);
+      else localStorage.removeItem(LS_PLAYER);
       updateStartButtonState();
     });
 
-    // Subject buttons: toggle active
     subjectButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         subjectButtons.forEach(b => b.classList.remove('active'));
@@ -206,16 +187,10 @@
       });
     });
 
-    // Start quiz
     startBtn.addEventListener('click', onStartQuiz);
-
-    // Next question
     nextBtn.addEventListener('click', onNextQuestion);
-
-    // Quit button -> go home (also saves progress)
     quitBtn.addEventListener('click', onQuit);
 
-    // Theme toggle
     themeToggle.addEventListener('click', () => {
       const current = document.body.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
       const next = current === 'dark' ? 'light' : 'dark';
@@ -223,9 +198,8 @@
       saveThemeToStorage(next);
     });
 
-    // Restart and Home on result page
     restartBtn.addEventListener('click', () => {
-      // Restart the same quiz from beginning
+      // restart should create a brand new quiz (reshuffle options again)
       startQuiz({ player: state.player, subject: state.subject, restart: true });
     });
     homeBtn.addEventListener('click', () => {
@@ -233,11 +207,8 @@
       showHome();
     });
 
-    // Keyboard accessibility: allow Enter to start if possible
     inputName.addEventListener('keyup', (e) => {
-      if (e.key === 'Enter' && !startBtn.disabled) {
-        onStartQuiz();
-      }
+      if (e.key === 'Enter' && !startBtn.disabled) onStartQuiz();
     });
   }
 
@@ -255,25 +226,20 @@
     if (!name || !subjectBtn) return;
 
     const subject = subjectBtn.getAttribute('data-subject');
-
-    // Save name (again)
     savePlayerToStorage(name);
 
-    // Check for saved progress
     const saved = loadProgressFromStorage();
     if (saved && saved.player === name && saved.subject === subject && saved.currentIndex < saved.total) {
-      // Offer resume using a confirm dialog for simplicity
       const resume = confirm('A saved quiz was found for you in this subject. Do you want to resume where you left off? Click OK to resume or Cancel to start a new quiz.');
       if (resume) {
-        // restore
         startQuiz({ player: name, subject, resume: true, saved });
         return;
       } else {
-        // clear saved progress and start fresh
         clearProgressFromStorage();
       }
     }
 
+    // Start a NEW quiz (restart true) -> options will be shuffled
     startQuiz({ player: name, subject, restart: true });
   }
 
@@ -284,17 +250,39 @@
     clearTimer();
     clearAutoNextTimeout();
 
-    // Reset state
+    // Reset state (we'll overwrite questions below)
     state.player = options.player;
     state.subject = options.subject;
-    state.questions = (window.QUESTIONS && window.QUESTIONS[state.subject]) ? window.QUESTIONS[state.subject].slice() : [];
+
+    // Read questions from global QUESTIONS object
+    const originalQuestions = (window.QUESTIONS && window.QUESTIONS[state.subject]) ? window.QUESTIONS[state.subject] : [];
+
+    // If starting a NEW quiz (not resuming), we create shuffled-copies of questions with shuffled options.
+    // If resuming, we want to keep the saved state as-is (no reshuffle), so we restore original order/options.
+    let preparedQuestions = [];
+    if (options.resume && options.saved) {
+      // Use originalQuestions (copy) without shuffling options, in order to match saved progress
+      preparedQuestions = originalQuestions.map(q => ({
+        question: q.question,
+        options: q.options.slice(),
+        answer: q.answer,
+        time: q.time
+      }));
+    } else {
+      // Fresh start or restart: shuffle options so answers appear in different positions each time
+      preparedQuestions = shuffleOptionsInQuestions(originalQuestions);
+      // Optional: you could also shuffle question order if you want:
+      // shuffleArray(preparedQuestions);
+    }
+
+    state.questions = preparedQuestions;
     state.total = state.questions.length;
     state.score = 0;
     state.correctCount = 0;
     state.wrongCount = 0;
 
     if (options.resume && options.saved) {
-      // restore saved progress: we trust saved object shape
+      // restore progress values (but be careful: options weren't shuffled)
       state.currentIndex = Math.max(0, Math.min(options.saved.currentIndex, state.total - 1));
       state.score = options.saved.score || 0;
       state.correctCount = options.saved.correctCount || 0;
@@ -304,7 +292,6 @@
       state.currentIndex = 0;
     }
 
-    // If there are no questions, bail out
     if (state.total === 0) {
       alert('No questions found for selected subject.');
       return;
@@ -314,13 +301,11 @@
     playerDisplay.textContent = `Player: ${state.player}`;
     subjectDisplay.textContent = `Subject: ${capitalize(state.subject)}`;
 
-    // Persist progress immediately
+    // Persist progress immediately (so resume will find it)
     persistProgress();
 
-    // Show quiz page
+    // Show quiz page and load first question
     showPage(quizPage);
-
-    // Load the first/next question
     loadQuestion();
   }
 
@@ -331,7 +316,7 @@
 
   // Load current question into UI
   function loadQuestion() {
-    // Stop any previous timers or timeouts
+    // Stop timers
     clearTimer();
     clearAutoNextTimeout();
 
@@ -341,18 +326,15 @@
     const idx = state.currentIndex;
     const qObj = state.questions[idx];
     if (!qObj) {
-      // Nothing more - show results
       showResults();
       return;
     }
 
-    // Show question number
+    // Show question number and text
     questionNumber.textContent = `Question ${idx + 1} / ${state.total}`;
-
-    // Question text
     questionText.textContent = qObj.question;
 
-    // Render options
+    // Render options (options already shuffled when quiz prepared)
     optionsList.innerHTML = '';
     qObj.options.forEach((optText, i) => {
       const li = document.createElement('li');
@@ -361,10 +343,8 @@
       button.type = 'button';
       button.setAttribute('data-index', String(i));
       button.textContent = optText;
-      // Accessibility
       button.setAttribute('aria-pressed', 'false');
 
-      // click handler
       button.addEventListener('click', () => onSelectOption(i, button));
 
       li.appendChild(button);
@@ -375,11 +355,9 @@
     const percent = Math.round((idx / state.total) * 100);
     updateProgress(percent);
 
-    // Prepare timer for question
+    // Timer for this question
     remainingTime = (typeof qObj.time === 'number' && qObj.time > 0) ? qObj.time : state.timePerQuestion;
     updateTimerUI(remainingTime);
-
-    // Start timer countdown
     startTimer(remainingTime, qObj.time || state.timePerQuestion);
   }
 
@@ -389,19 +367,14 @@
     progressPercent.textContent = `${percent}%`;
   }
 
-  // Start timer for current question
-  // totalSeconds - the total amount of seconds for the circle calculation (may match remaining)
+  // Timer functions
   function startTimer(initialSeconds, totalSeconds) {
-    // Ensure clearing previous timer
     clearTimer();
 
     let total = totalSeconds || initialSeconds;
     let left = initialSeconds;
 
-    // Update circle initially
     updateTimerPath(left, total);
-
-    // Update time text
     timeText.textContent = String(left).padStart(2, '0');
 
     timerInterval = setInterval(() => {
@@ -412,13 +385,9 @@
       updateTimerPath(left, total);
 
       if (left <= 0) {
-        // Time's up: handle automatic answer reveal and move to next question
         clearTimer();
-        // Mark as wrong and reveal correct answer
         markNoAnswer();
-        // Save progress
         persistProgress();
-        // Automatically go to next question after a short delay (1.2s)
         autoNextTimeout = setTimeout(() => {
           advanceToNext();
         }, 1200);
@@ -426,7 +395,6 @@
     }, 1000);
   }
 
-  // Update the circular timer path stroke offset
   function updateTimerPath(left, total) {
     if (!timerPath || !timerPathLength) return;
     const ratio = Math.max(0, Math.min(1, left / total));
@@ -434,37 +402,22 @@
     timerPath.style.strokeDashoffset = offset;
   }
 
-  // Update timer text and accessibility label
   function updateTimerUI(seconds) {
     timeText.textContent = String(seconds).padStart(2, '0');
   }
 
-  // Clear interval timer
-  function clearTimer() {
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-    }
-  }
+  function clearTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+  function clearAutoNextTimeout() { if (autoNextTimeout) { clearTimeout(autoNextTimeout); autoNextTimeout = null; } }
 
-  // Clear auto next timeout
-  function clearAutoNextTimeout() {
-    if (autoNextTimeout) {
-      clearTimeout(autoNextTimeout);
-      autoNextTimeout = null;
-    }
-  }
-
-  // Called when user selects an option
+  // Option selection
   function onSelectOption(selectedIndex, buttonEl) {
-    // Ignore if already answered (disable further clicks)
+    // Prevent double select
     if (nextBtn.disabled === false) return;
 
-    // Stop timer
     clearTimer();
     clearAutoNextTimeout();
 
-    // Mark selection visually
+    // visually mark selected item
     qsa('.option').forEach(o => {
       o.classList.remove('selected');
       o.setAttribute('aria-pressed', 'false');
@@ -472,123 +425,89 @@
     buttonEl.classList.add('selected');
     buttonEl.setAttribute('aria-pressed', 'true');
 
-    // Check answer and show feedback
+    // check answer and update state
     checkAnswer(Number(selectedIndex));
-
-    // Persist progress
     persistProgress();
-
-    // Enable next button
     nextBtn.disabled = false;
   }
 
-  // No answer (time ran out) -> reveal correct choice and mark wrong
+  // No answer (time out)
   function markNoAnswer() {
     const idx = state.currentIndex;
     const qObj = state.questions[idx];
-    // mark correct visually
     const correctIndex = qObj.answer;
     const correctBtn = optionsList.querySelector(`button[data-index="${correctIndex}"]`);
-    if (correctBtn) {
-      correctBtn.classList.add('correct');
-    }
-    // count as wrong
+    if (correctBtn) correctBtn.classList.add('correct');
     state.wrongCount += 1;
-    // Next button remains disabled in case we want to force auto-advance; but we allow manual
     nextBtn.disabled = false;
   }
 
-  // Check answer and update score/state/UI
+  // Check selected answer
   function checkAnswer(selectedIndex) {
     const idx = state.currentIndex;
     const qObj = state.questions[idx];
     const correctIndex = qObj.answer;
 
-    // Disable further option clicks by removing event listeners (simple approach: set pointer events none)
+    // disable further clicks
     qsa('.option').forEach(opt => opt.style.pointerEvents = 'none');
 
     if (selectedIndex === correctIndex) {
-      // Correct
       const btn = optionsList.querySelector(`button[data-index="${selectedIndex}"]`);
       if (btn) btn.classList.add('correct');
-
-      state.score += 1; // scoring: +1 per correct
+      state.score += 1;
       state.correctCount += 1;
     } else {
-      // Wrong: mark selected wrong and reveal correct
       const selBtn = optionsList.querySelector(`button[data-index="${selectedIndex}"]`);
       if (selBtn) selBtn.classList.add('wrong');
-
       const correctBtn = optionsList.querySelector(`button[data-index="${correctIndex}"]`);
       if (correctBtn) correctBtn.classList.add('correct');
-
       state.wrongCount += 1;
     }
 
-    // Update highscore live if exceeded
     const high = loadHighscoreFromStorage();
     if (state.score > high) {
       saveHighscoreToStorage(state.score);
       renderHighscore();
     }
 
-    // also allow automatic next after short delay
+    // auto next after short delay
     autoNextTimeout = setTimeout(() => {
       advanceToNext();
     }, 900);
   }
 
-  // Advance to next question or end quiz
+  // Advance to next question or result
   function advanceToNext() {
-    // Clear auto-next in case used manually
     clearAutoNextTimeout();
-
-    // prepare next index
     state.currentIndex += 1;
 
-    // If we've reached the end, show results
     if (state.currentIndex >= state.total) {
-      // persist final state
-      persistProgress(true); // true -> final
+      persistProgress(true);
       showResults();
       return;
     }
 
-    // persist progress
     persistProgress();
-
-    // Reset option pointer events (so future options clickable)
     qsa('.option').forEach(opt => opt.style.pointerEvents = '');
-
-    // Load next question
     loadQuestion();
   }
 
-  // Handler for Next button (manual)
   function onNextQuestion() {
-    // Prevent multiple clicks
     if (nextBtn.disabled) return;
-
-    // Clear any running timers/timeouts
     clearTimer();
     clearAutoNextTimeout();
-
-    // Advance
     advanceToNext();
   }
 
-  // Quit handler: return home and optionally save progress
   function onQuit() {
     const confirmQuit = confirm('Do you want to quit the quiz? Your progress will be saved and you can resume later.');
     if (confirmQuit) {
-      // Save progress and go home
       persistProgress();
       showHome();
     }
   }
 
   // Persist progress to localStorage
-  // If finalFlag true, we mark progress as complete and may clear it
   function persistProgress(finalFlag = false) {
     const progress = {
       player: state.player,
@@ -602,31 +521,24 @@
     };
 
     if (finalFlag) {
-      // update highscore if needed, clear saved progress
       const storedHigh = loadHighscoreFromStorage();
       if (state.score > storedHigh) saveHighscoreToStorage(state.score);
       clearProgressFromStorage();
     } else {
       saveProgressToStorage(progress);
     }
-
-    // update header highscore (in case changed)
     renderHighscore();
   }
 
-  // Show result page
+  // Show results screen
   function showResults() {
-    // Stop timers
     clearTimer();
     clearAutoNextTimeout();
 
-    // Compute final metrics
     const totalQ = state.total;
     const correct = state.correctCount;
     const wrong = state.wrongCount;
     const score = state.score;
-
-    // Performance message based on percentage
     const percent = totalQ ? Math.round((correct / totalQ) * 100) : 0;
     let message = 'Keep learning and try again!';
     if (percent >= 90) message = 'Outstanding! You aced it!';
@@ -634,14 +546,12 @@
     else if (percent >= 50) message = 'Good effort! Keep practicing.';
     else if (percent >= 30) message = 'Not bad — try again to improve.';
 
-    // Update highscore if needed
     const storedHigh = loadHighscoreFromStorage();
     if (score > storedHigh) {
       saveHighscoreToStorage(score);
       renderHighscore();
     }
 
-    // Populate result UI
     resultPlayer.textContent = state.player || '—';
     resultSubject.textContent = capitalize(state.subject);
     resultTotal.textContent = totalQ;
@@ -650,25 +560,18 @@
     resultScore.textContent = score;
     resultMessage.textContent = `${message} (${percent}%)`;
 
-    // Clear saved progress now that quiz is complete
     clearProgressFromStorage();
-
-    // Show result page
     showPage(resultPage);
   }
 
-  // Show home page and restore some UI
   function showHome() {
-    // Reset start button state
     updateStartButtonState();
-    // Show home
     showPage(homePage);
   }
 
-  // On DOM ready, call init
   document.addEventListener('DOMContentLoaded', init);
 
-  // Expose some internals for debugging (optional)
+  // Optional debug API
   window.SmartQuiz = {
     getState: () => state,
     persistProgress,
