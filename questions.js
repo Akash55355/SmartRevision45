@@ -1,6 +1,5 @@
 /* ==========================================================================
-   questions.js (Bengali biology set)
-   - Replaced science questions with the Bengali questions you provided.
+   questions.js (Bengali science set)
    - Each question has 4 options (one correct).
    - time: 20 seconds per question (you can adjust).
    - Keep filename as questions.js and ensure index.html loads this file.
