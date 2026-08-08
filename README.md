@@ -1,1 +1,1 @@
-# QuizMaster
+# Smart Revision
